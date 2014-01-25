@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Maryland Population</title>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="http://d3js.org/d3.geo.projection.v0.min.js"></script>
+		<script src="http://d3js.org/topojson.v1.min.js"></script>
+		<style type="text/css">
+		
+			.graticule {
+				fill: none;
+				stroke: #999;
+			}
+
+			
+			.boundary {
+				fill: none;
+				stroke: #000;
+/*				stroke-dasharray: 7,6;
+				stroke-linejoin: round;
+*/				stroke-width: 0.5;
+			}
+			
+			.counties :hover {
+				fill: yellow !important;
+			}
+			
+			.q0-9 { fill:rgb(247,251,255); }
+			.q1-9 { fill:rgb(222,235,247); }
+			.q2-9 { fill:rgb(198,219,239); }
+			.q3-9 { fill:rgb(158,202,225); }
+			.q4-9 { fill:rgb(107,174,214); }
+			.q5-9 { fill:rgb(66,146,198); }
+			.q6-9 { fill:rgb(33,113,181); }
+			.q7-9 { fill:rgb(8,81,156); }
+			.q8-9 { fill:rgb(8,48,107); }
+
+				
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+
+			//Width and height
+			var w = 900;
+			var h = 400;
+
+			//Define map projection
+//			var projection = d3.geo.albersUsa()
+//								   .translate([-1800, 600])
+//								   .scale([8000]);
+
+/*			var projection = d3.geo.mercator()
+				.center([-76.72, 39.07])
+				.rotate([1.0, 0])
+//				.parallels([35, 45])
+				.scale(7000)
+				.translate([w/2, h/2]);
+*/				
+			
+			var projection = d3.geo.satellite()
+				.distance(1.1)
+				.translate([-1950, 250])
+				.scale(12000)
+				.rotate([94.00, -37.50, 17.00])
+				.center([-2, 5])
+				.tilt(0)
+				.clipAngle(25);
+
+			var graticule = d3.geo.graticule()
+				.extent([[-113, 27], [-47 + 1e-6, 57 + 1e-6]])
+				.step([3, 3]);
+			
+
+			//Define path generator
+			var path = d3.geo.path()
+							 .projection(projection);
+
+//			var rateById = d3.map();
+
+			var quantize = d3.scale.quantize()
+				.range(d3.range(9).map(function(i) { return "q" + i + "-9"; }));
+
+			//Create SVG element
+			var svg = d3.select("body")
+				.append("svg")
+				.attr("width", w)
+				.attr("height", h);
+				
+			svg.append("path")
+				.datum(graticule)
+				.attr("class", "graticule")
+				.attr("d", path);
+
+						
+			var thearray = []
+
+			//Load in GeoJSON data
+			d3.json("topojson/maryland_counties_03_topo.json", function(json) {
+
+				var geojson = topojson.feature(json, json.objects.maryland_counties_01_geo);
+
+				for (i=0; i<geojson.features.length; i++){
+					thearray[i] = geojson.features[i].properties.pop
+				}
+
+//				themin = d3.min(thepops)//, function(d) { return d.value; }) 
+
+				quantize.domain([
+					d3.min(thearray), 
+					d3.max(thearray)
+				]);
+
+				//Bind data and create one path per GeoJSON feature
+				svg.append('g')
+					.attr('class', 'counties')
+					.selectAll('path')
+					.data(geojson.features)
+					.enter()
+					.append('path')
+//					.attr('class', 'q3-9')
+					.attr('class', function(d) { return quantize(d.properties.pop); })
+					.attr('d', path)
+//					.style("fill", "steelblue");
+					
+				svg.append('path')
+					.datum(topojson.mesh(json, json.objects.maryland_counties_01_geo))
+//					.datum(topojson.mesh(json, json.objects.maryland_counties_geo, function(a, b) { return a !== b }))
+					.attr('d', path)
+					.attr('class', 'boundary');
+	
+					
+			});
+			
+		</script>
+	</body>
+</html>

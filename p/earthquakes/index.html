@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Recent California Earthquakes</title>
+		<link rel='stylesheet' href='../style.css'/>
+		<link rel='stylesheet' href='css/style.css'/>
+		<script src='http://code.jquery.com/jquery-1.7.1.min.js'></script>
+		<script src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=visualization"></script>
+<!--		<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+-->
+		<script src='scripts/arcgislink_compiled.js'></script>
+		<script src='http://google-maps-utility-library-v3.googlecode.com/svn/tags/extdraggableobject/1.0/src/ExtDraggableObject.js'></script>
+
+		<script>
+		
+			var lines = [];
+			var textpart = [];
+			var map, pointarray, heatmap;
+			var maxrad = 100
+			
+			function init(){
+				map = new google.maps.Map(document.getElementById('mainmap-canvas'), {
+					center: new google.maps.LatLng(36, -122),
+					zoom: 5,
+					mapTypeId: google.maps.MapTypeId.HYBRID
+				});
+				
+				$.ajax({
+					type: "GET",
+					url: 'data/earthquakes.csv',
+					dataType: "text",
+					success: processData
+				});
+			}
+				
+			function showOp(opval){
+				//'opv' is the span giving the percent opacity in numbers
+				document.getElementById('opv').innerHTML = parseInt(opval * 100);
+			}
+
+			function opacitySlider(){
+				var bar = document.getElementById("op");
+				// bar is the red bar
+				var container = document.getElementById("opSlider");
+				// container is the yellow bar
+				var range = (parseInt(container.style.width)-parseInt(bar.style.width));
+				var opSlider = new ExtDraggableObject(bar, {
+					restrictY:true,
+					container:container
+				});
+				opSlider.setValueX(range * heatmap.get('opacity'));
+//				alert(heatmap.get('opacity'));
+				showOp(heatmap.get('opacity'));
+				
+				google.maps.event.addListener(opSlider, 'drag', function(evt){
+					var op = opSlider.left()/range;
+					heatmap.setOptions({opacity: op});
+					showOp(op);
+				});
+				
+				google.maps.event.addDomListener(document.getElementById('opLess'), 'click', function(){
+					var op = Math.max(heatmap.get('opacity')-0.1, 0);
+					heatmap.setOptions({opacity: op});
+					opSlider.setValueX(range * op);
+					showOp(op);
+					heatmap.hide();
+				});
+				
+				google.maps.event.addDomListener(document.getElementById('opMore'), 'click', function(){
+					var op = Math.min(heatmap.get('opacity')+0.1, 1);
+					heatmap.setOptions({opacity: op});
+					opSlider.setValueX(range * op);
+					showOp(op);
+					heatmap.show();
+				});
+			}
+			
+			
+			
+			function showRad(rad){
+				//'radv' is the span giving the radius in numbers
+				document.getElementById('radv').innerHTML = parseInt(rad);
+			}
+
+			
+			function radiusSlider(){
+				var bar = document.getElementById("rad");
+				// bar is the red bar
+				var container = document.getElementById("radSlider");
+				// container is the yellow bar
+				var range = (parseInt(container.style.width)-parseInt(bar.style.width));
+//				alert(range)
+				var radSlider = new ExtDraggableObject(bar, {
+					restrictY:true,
+					container:container
+				});
+				radSlider.setValueX(range * (heatmap.get('radius')/maxrad));
+//				alert(heatmap.get('radius')/maxrad);
+				showRad(heatmap.get('radius'));
+//				alert(heatmap.get('radius')/maxrad);
+				
+				google.maps.event.addListener(radSlider, 'drag', function(evt){
+					var rad = radSlider.left()/range;
+					var radval = rad*maxrad
+					heatmap.setOptions({radius: (radval)});
+					showRad(radval);
+				});
+				
+				google.maps.event.addDomListener(document.getElementById('radLess'), 'click', function(){
+					var rad = Math.max((heatmap.get('radius')/maxrad)-0.05, 0);
+					var radval = rad*maxrad
+					heatmap.setOptions({radius: radval});
+					radSlider.setValueX(range * (rad));
+					showRad(radval);
+					heatmap.hide();
+				});
+				
+				google.maps.event.addDomListener(document.getElementById('radMore'), 'click', function(){
+					var rad = Math.min((heatmap.get('radius')/maxrad)+0.05, 1);
+					var radval = rad*maxrad
+					heatmap.setOptions({radius: (radval)});
+					radSlider.setValueX(range * rad);
+					showRad(radval);
+					heatmap.show();
+				});
+			}
+			
+			function processData(allText) {
+//				alert('function started');
+				var allTextLines = allText.split(/\r\n|\n/);
+				
+				for (var i=0; i<allTextLines.length-1; i++) {
+					textpart = allTextLines[i].split(',');
+					var lat = textpart[0];
+					var lng = textpart[1];
+					lines[i] = new google.maps.LatLng(lat, lng);
+				}
+//				alert(allTextLines[0])
+//				alert(lines[0]);
+
+				addHeat(lines);
+
+			}
+				
+			function addHeat(lines){
+//				alert(lines.length);
+				heatmap = new google.maps.visualization.HeatmapLayer({
+					data: lines,
+					opacity: 1.0,
+					radius: 20
+				});
+				heatmap.setMap(map);
+				opacitySlider();
+				radiusSlider();
+			}
+
+/*			
+			function toggleHeatmap() {
+				heatmap.setMap(heatmap.getMap() ? null : map);
+			}
+*/			
+			function changeGradient() {
+				var gradient = [
+				'rgba(0, 255, 255, 0)',
+				'rgba(0, 255, 255, 1)',
+				'rgba(0, 191, 255, 1)',
+				'rgba(0, 127, 255, 1)',
+				'rgba(0, 63, 255, 1)',
+				'rgba(0, 0, 255, 1)',
+				'rgba(0, 0, 223, 1)',
+				'rgba(0, 0, 191, 1)',
+				'rgba(0, 0, 159, 1)',
+				'rgba(0, 0, 127, 1)',
+				'rgba(63, 0, 91, 1)',
+				'rgba(127, 0, 63, 1)',
+				'rgba(191, 0, 31, 1)',
+				'rgba(255, 0, 0, 1)'
+				]
+				
+				heatmap.setOptions({
+					gradient: heatmap.get('gradient') ? null : gradient
+				});
+			}
+/*			
+			function changeRadius() {
+				heatmap.setOptions({radius: heatmap.get('radius') ? null : 20});
+			}
+			
+			function changeOpacity() {
+				heatmap.setOptions({opacity: heatmap.get('opacity') ? null : 1.0});
+			}
+*/			
+			$(document).ready(init)
+		</script>
+	</head>
+	<body>
+		<div id='mainpage'>
+			<a href='http://www.mapperkeeper.com'>Home</a>
+			<h2 id='title'>Recent California Earthquakes</h2>
+			<div id='allstuff'>
+				<div id='alloptions'>
+					<h4 id='colTitle'>Heatmap Display Options</h4>
+					Change the Heatmap Opacity
+					<div id="opContainer" style="position:absolute; margin-left:10px">
+						<div id="opLess" title="Less" style="padding:0px; margin:0px;position:absolute;top:0px;left:0px;width:20px;height:20px;background-color: white;cursor:pointer;text-align:center;">&nbsp;-&nbsp;</div>
+						<div id="opSlider" style="padding: 0px; margin:0px;position:absolute;top:0px;left:22px;overflow:hidden;background-color:yellow;width:160px;height:20px;color:#AAAAAA;font-size:0.9em">&nbsp;Drag to Change (<span id='opv'></span>)%
+						<div id="op" title="Drag me!" style="padding: 0px; margin:0px;position:absolute;top:0px;left:0px;overflow:hidden;background-color:red;width:12px;height:20px;cursor:pointer;">&nbsp;</div>
+						</div>
+						<div id="opMore" title="More" style="padding: 0px; margin:0px;position:absolute;top:0px;left:184px;overflow:hidden;background-color:white;width:20px;height:20px;cursor:pointer;text-align:center;">&nbsp;+&nbsp;</div>
+					</div>
+					<br/><br/><br/>
+					Change the Heatmap Radius
+					<div id="radContainer" style="position:absolute; margin-left:10px">
+						<div id="radLess" title="Less" style="padding:0px; margin:0px;position:absolute;top:0px;left:0px;width:20px;height:20px;background-color: white;cursor:pointer;text-align:center;">&nbsp;-&nbsp;</div>
+						<div id="radSlider" style="padding: 0px; margin:0px;position:absolute;top:0px;left:22px;overflow:hidden;background-color:yellow;width:160px;height:20px;color:#AAAAAA;font-size:0.9em">&nbsp;Drag to Change (<span id='radv'></span>)
+							<div id="rad" title="Drag me!" style="padding: 0px; margin:0px;position:absolute;top:0px;left:0px;overflow:hidden;background-color:red;width:12px;height:20px;cursor:pointer;">&nbsp;</div>
+						</div>
+						<div id="radMore" title="More" style="padding: 0px; margin:0px;position:absolute;top:0px;left:184px;overflow:hidden;background-color:white;width:20px;height:20px;cursor:pointer;text-align:center;">&nbsp;+&nbsp;</div>
+					</div>
+					<br/><br/><br/>
+					Toggle the Color Gradient
+					<br/>
+					<button onclick="changeGradient()">Toggle</button>
+				</div>
+			
+				<div id='mainmap-canvas'></div>
+			</div><!-- end of allstuff  -->
+
+			<br/>
+			<div id='ApDescription'>
+				This application's basemap was accessed using the
+				<a href='https://developers.google.com/maps/documentation/javascript/' target='_blank'>
+				Google Maps JavaScript API v3</a>, and the
+				heatmap layer was added by including the Visualization Library.
+				The heatmap-display-options sliders were created with reference to scripts from the
+				<a href='http://code.google.com/p/google-maps-utility-library-v3/' target='_blank'>
+				Google Maps Utility Library v3</a>.  Earthquake data was downloaded as a CSV file from
+				<a href='http://earthquake.usgs.gov/earthquakes/feed/' target='_blank'>
+				http://earthquake.usgs.gov/earthquakes/feed/</a>; the data shown represents all
+				2.5+ earthquakes that occurred between 11/10/2012 and 12/10/2012. 
+			</div>
+
+
+		</div><!-- end of mainpage -->
+	</body>
+</html>
