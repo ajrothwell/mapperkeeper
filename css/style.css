@@ -11,6 +11,10 @@ body{
 	padding: 15px;
 }
 
+.title01{
+	font-size: 40px;
+}
+
 .column{
 	width: 49%;
 	list-style-type: none;
