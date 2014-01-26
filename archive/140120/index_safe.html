@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Andy Rothwell's GIS Applications</title>
+		<link rel='stylesheet' href='css/mystyles.css' />
+		<script src='code.jquery.com/jquery-1.7.1.min.js'></script>
+		
+		<script>
+			
+			function moveToLink(){
+				alert('hi');
+			}
+			
+			$('#anybox').click(moveToLink);
+			
+		</script>
+	</head>
+	<body>
+		<div id='homemainpage'>
+			<h1>Andy Rothwell's GIS Applications</h1>
+			<h2>Web GIS Projects</h2>
+			<div id='projectGrid'>
+				<div id='leftColumn'>
+					<div id='anybox'>
+						<a href='earthquakes.html'><img id='animage' src='images/earthquakes_small.jpg'></a>
+						<a href='earthquakes.html'><b>Recent Earthquakes Map</b></a>
+						<p id='ShortApDescription'>Google Maps JavaScript API, Google Maps Heatmap Layer using Google Visualization and Utility Libraries</p> 
+					</div>
+					<div id='anybox'>
+						<a href='route.html'><img id='animage' src='images/route_small.jpg'></a>
+						<a href='route.html'><b>Local Route Map</b></a>
+						<p id='ShortApDescription'>ArcGIS JavaScript API, HTML5 Geolocation, Yahoo Local Search Services, ArcGIS Geocode and Network Analyst Services</p> 
+					</div>
+					<div id='anybox'>
+						<a href='election.html'><img id='animage' src='images/election_small.jpg'></a>
+						<a href='election.html'><b>2012 Presidential Election Results by State</b></a>
+						<p id='ShortApDescription'>Google Maps JavaScript API, Google Fusion Tables</p>
+					</div>
+				</div><!-- end of leftColumn -->
+				<div id='rightColumn'>
+					<div id='anybox'>
+						<a href='http://129.2.24.163:8080/rothwell/FinalProject/computer.html'><img id='animage' src='images/counties_comp.jpg'></a>
+						<a href='http://129.2.24.163:8080/rothwell/FinalProject/computer.html'><b>Query USA Counties - Computer Version</b></a>
+						<p id='ShortApDescription'>Google Maps JavaScript API, ArcGIS Server Link for Google Maps API, ArcGIS REST Services, MySQL, JQuery Mobile</p> 
+					</div>
+					<div id='anybox'>
+						<a href='http://129.2.24.163:8080/rothwell/FinalProject/mobile.html'><img id='animage' src='images/counties_comp.jpg'></a>
+						<a href='http://129.2.24.163:8080/rothwell/FinalProject/mobile.html'><b>Query USA Counties - Mobile Device Version</b></a>
+						<p id='ShortApDescription'>Google Maps JavaScript API, ArcGIS Server Link for Google Maps API, ArcGIS REST Services, MySQL, JQuery Mobile</p> 
+					</div>
+					<div id='anybox'>
+						<a href='topojson_01.html'><img id='animage' src='images/MarylandCountyPopulation_small.jpg'></a>
+						<a href='topojson_01.html'><b>Maryland County Population</b></a>
+						<p id='ShortApDescription'>D3</p> 
+					</div>
+				</div><!-- end of rightColumn -->
+			</div><!-- end of projectGrid -->
+			<div id='contactInfo'>
+				All content created by Andy Rothwell<br/>
+				contact: rothwell.andy@gmail.com
+			</div>
+		</div><!--end of pagetext -->
+	</body>
+</html>
