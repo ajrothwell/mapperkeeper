@@ -12,7 +12,11 @@ body{
 }
 
 .title01{
+<<<<<<< HEAD
 	font-size: 60px;
+=======
+	font-size: 80px;
+>>>>>>> master
 }
 
 .column{
