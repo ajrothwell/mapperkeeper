@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Local Route Map</title>
+		<link rel='stylesheet' href='../style.css' />
+		<link rel='stylesheet' href='css/style.css' />
+		<link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/dojo/dijit/themes/tundra/tundra.css">
+		<link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/esri/css/esri.css" />
+		<script src='http://serverapi.arcgisonline.com/jsapi/arcgis/?v=3.2compact'></script>
+		<script src='http://code.jquery.com/jquery-1.7.1.min.js'></script>
+
+
+
+		<style type="text/css">
+			/* set title font properties */
+			.infowindow .window .top .right .user .titlebar .title { font-family:Arial, Helvetica, sans-serif; font-weight:bold; font-size:14pt; }
+			/* set content font properties */
+			.infowindow .window .top .right .user .content { font-style:italic; font-size:10pt; }
+		</style>
+
+		
+		<script>
+			dojo.require('esri.map');
+			dojo.require('esri.tasks.locator');
+			dojo.require('esri.tasks.route');
+			dojo.require('esri.layers.osm');
+			dojo.require('esri.virtualearth.VETiledLayer');
+//			dojo.require("esri.dijit.InfoWindow");
+
+
+			
+			var map;
+			var locator;
+			var startLoc, endLoc;
+			var currentLocation, finalLocation;
+			var WMcurrentLocation, screenCurrentLocation;
+			var WMfinalLocation, screenFinalLocation;
+			var currentLocationLayer, locationsLayer;
+			var routeGraphicLayer, segmentGraphicsLayer, routeTask, params, directionFeatures;
+
+			var WSMbaseMapUrl = 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer';
+			var tiledMapServiceLayer;
+//			var tiledMapServiceLayer = new esri.layers.ArcGISTiledMapServiceLayer(WSMbaseMapUrl);
+
+			var osmLayer
+//			var osmLayer = new esri.layers.OpenStreetMapLayer();
+
+			var veTileLayer
+//			var veTileLayer = new esri.virtualearth.VETiledLayer({
+//				bingMapsKey: 'Ak5BoH2MY65lqw1-pv_WQQI8EJVJ2QF3eE_k1achyt5vsbMQO0-LYWcBJs6uE1rY',
+//				mapStyle: esri.virtualearth.VETiledLayer.MAP_STYLE_AERIAL_WITH_LABELS
+//			});
+
+
+			
+			$(document).ready(init);
+			
+			function init(){
+				navigator.geolocation.getCurrentPosition(processLoc);
+				
+				// this part allows searches for anything
+				$('#submitSearch').click(function(){
+					var formData = $('#theSearch').serialize();
+					test = formData.slice(10, formData.length)
+//					alert(test)
+					
+/*					$.ajax({
+						type: 'GET',
+						url: 'theSearch.php',
+						cache: false,
+						data: formData,
+						success: queryYahoo
+					});
+*/
+					queryYahoo(test)
+				});
+			}
+			
+/*			function onSuccess(data){
+				alert(data)
+			}
+*/
+			
+			function processLoc(position){
+				var lat = position.coords.latitude;
+				var lng = position.coords.longitude;
+				currentLocation = new esri.geometry.Point(lng, lat, new esri.SpatialReference({wkid:4326}));
+//				locator = new esri.tasks.Locator('http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Locators/ESRI_Geocode_USA/GeocodeServer');
+//				locator.locationToAddress(currentLocation, 100, function(candidate){
+//					$('#yourAddress').html('Your Approximate Address: ' + candidate.address.Address);
+//				});
+				initMap(lat, lng);
+			}
+			
+			function initMap(lat,lng){
+				var xmin = lng - 0.005;
+				var ymin = lat - 0.005;
+				var xmax = lng + 0.005;
+				var ymax = lat + 0.005;
+				var extent = new esri.geometry.Extent(xmin, ymin, xmax, ymax, new esri.SpatialReference({wkid:4326}));
+				var wmExtent = esri.geometry.geographicToWebMercator(extent);
+				map = new esri.Map('routeMapDiv');
+				map.setExtent(wmExtent, true);
+				tiledMapServiceLayer = new esri.layers.ArcGISTiledMapServiceLayer(WSMbaseMapUrl);
+				map.addLayer(tiledMapServiceLayer);
+				
+				osmLayer = new esri.layers.OpenStreetMapLayer();
+//				map.addLayer(osmLayer);
+				veTileLayer = new esri.virtualearth.VETiledLayer({
+					bingMapsKey: 'Ak5BoH2MY65lqw1-pv_WQQI8EJVJ2QF3eE_k1achyt5vsbMQO0-LYWcBJs6uE1rY',
+					mapStyle: esri.virtualearth.VETiledLayer.MAP_STYLE_AERIAL_WITH_LABELS
+				});
+//				map.addLayer(veTileLayer);
+
+				
+				currentLocationLayer = new esri.layers.GraphicsLayer();
+				map.addLayer(currentLocationLayer);
+				var fromSymbol = new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color([50,150,50]));
+				WMcurrentLocation = esri.geometry.geographicToWebMercator(currentLocation);
+				startLoc = new esri.Graphic(WMcurrentLocation, fromSymbol);
+				currentLocationLayer.add(startLoc);
+				locationsLayer = new esri.layers.GraphicsLayer();
+				map.addLayer(locationsLayer);
+				
+				var routePolylineSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([100,200,0,0.8]), 5.5);
+				var routeRenderer = new esri.renderer.SimpleRenderer(routePolylineSymbol);
+				routeGraphicLayer = new esri.layers.GraphicsLayer();
+				routeGraphicLayer.setRenderer(routeRenderer);
+				map.addLayer(routeGraphicLayer);
+				
+				//add infoWindow stuff here
+//				dojo.connect(map, "onLoad", addWindow);
+				dojo.connect(map,"onLoad", function(map) {map.infoWindow.resize(250, 50);} );
+				addFirstWindow()
+
+				
+				routeTask = new esri.tasks.RouteTask('http://servicesbeta.esri.com/arcgis/rest/services/Network/USA/NAServer/Route');
+				params = new esri.tasks.RouteParameters();
+				params.stops = new esri.tasks.FeatureSet();
+				params.returnRoutes = true;
+				params.returnDirections = true;
+				
+			}
+			
+			function addFirstWindow(){
+//				dojo.connect(map,"onLoad", function(map) {map.infoWindow.resize(250, 100);} );
+				screenCurrentLocation = map.toScreen(WMcurrentLocation);
+//				alert(currentLocation.y + ', ' + currentLocation.x)
+//				alert(screenCurrentLocation.y + ', ' + screenCurrentLocation.x)
+				map.infoWindow.setTitle('Your Approximate Address');
+				map.infoWindow.setContent("<div id='newAddress'></div>");
+				map.infoWindow.show(screenCurrentLocation,map.getInfoWindowAnchor(screenCurrentLocation));
+				placeFirstAddress()
+			}
+			
+			function placeFirstAddress(){
+				locator = new esri.tasks.Locator('http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Locators/ESRI_Geocode_USA/GeocodeServer');
+				locator.locationToAddress(currentLocation, 100, function(candidate){
+					$('#newAddress').html(candidate.address.Address);
+				});
+			}
+			
+			
+/*			function mapLocation(aLocation){
+				var fromSymbol = new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color([255,0,0]));
+				startLoc = new esri.Graphic(currentLocation, fromSymbol);
+				currentLocationLayer.add(startLoc);
+			}
+*/			
+
+			function addTiledLayer(){
+				map.removeLayer(osmLayer)				
+				map.removeLayer(veTileLayer);
+				tiledMapServiceLayer = new esri.layers.ArcGISTiledMapServiceLayer(WSMbaseMapUrl);
+				map.addLayer(tiledMapServiceLayer);
+			}
+
+
+			function addOSMLayer(){
+				map.removeLayer(tiledMapServiceLayer)				
+				map.removeLayer(veTileLayer);
+				osmLayer = new esri.layers.OpenStreetMapLayer();
+				map.addLayer(osmLayer);
+			}
+			
+			function addVETileLayer(){
+				map.removeLayer(tiledMapServiceLayer)				
+				map.removeLayer(osmLayer);
+				veTileLayer = new esri.virtualearth.VETiledLayer({
+					bingMapsKey: 'Ak5BoH2MY65lqw1-pv_WQQI8EJVJ2QF3eE_k1achyt5vsbMQO0-LYWcBJs6uE1rY',
+					mapStyle: esri.virtualearth.VETiledLayer.MAP_STYLE_AERIAL_WITH_LABELS
+				});
+				map.addLayer(veTileLayer);
+			}			
+			
+			
+			function queryYahoo(queryVal){
+				var dist=5;
+				var queryParams={
+					query: queryVal,
+					latitude: currentLocation.y,
+					longitude: currentLocation.x,
+					radius: dist,
+					results: 10,
+					output: 'json',
+					appid: "7UknQkDV34FFWhYmRrsxR7UFA79vBtS_IWZau5b2HwJxmYNd11YzYG2aUVUARbtSjgQ3Jcwkzmbv.2qYGipFwaAfwrWX2A8-"
+				};
+				esri.request({
+					url: 'http://local.yahooapis.com/LocalSearchService/V3/localSearch',
+					content: queryParams,
+					handleAs: 'json',
+					callbackParamName: 'callback',
+					load: buildYahooLocalLocations,
+					error: esri.config.defaults.io.errorHandler
+				});
+			}
+			
+			function buildYahooLocalLocations(response){
+//				alert('1')
+				$('#routeList').empty();
+//				alert('2')
+				results = response.ResultSet.Result;
+				for(var i=0; i<results.length; i++){
+//					var content = "<a onclick='locationDetails(" + i + ")'>" + results[i].Title + "</a><br/>";
+					var content = "<button onclick='locationDetails(" + i + ")'>" + results[i].Title + "</button><br/>";
+//					var resultItem = $('<li>').html(content);
+					$('#routeList').append(content);
+				};
+//				alert('3')
+			}
+			
+			function locationDetails(index){
+				var info={};
+				info.lat = results[index].Latitude;
+				info.lon = results[index].Longitude;
+				info.title = results[index].Title;
+				info.address = results[index].Address;
+				mapResults(info);
+			}
+			
+			function mapResults(info){
+				locationsLayer.clear();
+				routeGraphicLayer.clear();
+				finalLocation = new esri.geometry.Point(info.lon, info.lat, new esri.SpatialReference({wkid:4326}))
+				WMfinalLocation = esri.geometry.geographicToWebMercator(finalLocation)
+				screenFinalLocation = map.toScreen(WMfinalLocation);
+				var toSymbol = new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color([0,0,200]));
+				endLoc = new esri.Graphic(WMfinalLocation, toSymbol);
+				locationsLayer.add(endLoc);
+				
+				params.directionsLengthUnits = esri.Units.MILES;
+				params.outSpatialReference = map.spatialReference;
+				params.stops.features[0] = startLoc;
+				params.stops.features[1] = endLoc;
+				
+				routeTask.solve(params, function(solveResult){
+					var directions = solveResult.routeResults[0].directions;
+					routeGraphicLayer.add(new esri.Graphic(directions.mergedGeometry));
+					map.setExtent(directions.extent, true);
+				});
+				
+				addSecondWindow(info)
+			}
+			
+			function addSecondWindow(info){
+				map.infoWindow.setTitle("<div id='businessName'></div>");
+				map.infoWindow.setContent("<div id='newBusinessAddress'></div>");
+				map.infoWindow.show(screenFinalLocation,map.getInfoWindowAnchor(screenFinalLocation));
+				placeSecondAddress(info)
+			}
+			
+			function placeSecondAddress(info){
+				$('#businessName').html(info.title);
+				$('#newBusinessAddress').html(info.address);
+			}
+
+			
+			
+			
+			
+		</script>
+	</head>
+		
+	<body>
+		<div id='mainpage'>
+			<a href='http://www.mapperkeeper.com'>Home</a>
+			<h2 id='title'>Find and Route Local Businesses</h2>
+<!--			<div id='yourAddress'>Your Approximate Address:</div>
+-->			<div id='formDiv'>
+				<input type='text' name='theSearch' id='theSearch' placeholder='Enter a Search Term'></input>
+				<button id='submitSearch'>Submit Search</button>
+			</div>
+
+			<div id='routeMapAndList'>
+				<div id='routeMapDiv'></div>
+				<div id='routeList'></div>
+			</div>
+
+			<div id='layerButtons'>
+				Change the Basemap: 
+				<button onclick='addTiledLayer()'>Esri Steet Map</button>
+				<button onclick='addOSMLayer()'>Open Street Map</button>
+				<button onclick='addVETileLayer()'>Bing Map</button>
+			</div>
+			<br/>
+			<div id='ApDescription'>
+				This application's basemaps (including the Open Street Map and Bing basemaps)
+				were accessed using the
+				<a href='http://help.arcgis.com/en/webapi/javascript/arcgis/' target='_blank'>
+				ArcGIS JavaScript API v3</a>.  The user's location was determined using the HTML 5
+				Geolocation API, and the approximate address was determined using
+				the Reverse Geocoding service of the ArcGIS API.
+				Local businesses are found with
+				<a href='http://developer.yahoo.com/search/local/V3/localSearch.html' target='_blank'>
+				Yahoo's Local Search Web Services</a>. Routes were determined using
+				Network Analyst services of the ArcGIS API.
+			</div>
+
+		</div><!-- end of mainpage -->
+	</body>
+</html>

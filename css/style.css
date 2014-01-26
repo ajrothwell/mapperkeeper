@@ -1,0 +1,63 @@
+
+body{
+	background-color: #DDDDFF;
+	padding: 10px;
+	font-family: "Arial";
+}
+
+#homemainpage{
+	background-color:white;
+	text-align:center;
+	padding: 15px;
+}
+
+.title01{
+	font-size: 60px;
+}
+
+.column{
+	width: 49%;
+	list-style-type: none;
+	padding: 0;
+}
+
+#leftColumn{
+	float:left;
+}
+
+#rightColumn{
+	float: right;
+}
+
+.anybox{
+	width: 100%;
+	clear: both;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #000000;
+}
+
+.imageDiv{
+	float: left;
+	padding: 5px;
+	margin-right: 5px;
+}
+
+.animage{
+	height: 145px;
+	width: 255px;
+}
+
+.descriptionDiv{
+	padding: 5px;
+	min-height: 155px;
+}
+
+.ShortApDescription{
+	font-size: 8pt;
+}
+
+#contactInfo{
+	clear:both;
+	padding:10px;
+}
