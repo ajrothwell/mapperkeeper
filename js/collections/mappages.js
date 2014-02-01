@@ -6,7 +6,8 @@ var app = app || {};
 app.MappageCollection = Backbone.Collection.extend({
 	model: app.Mappage
 });
-//app.myMappageCollection = new app.MappageCollection()
+
+// create a collection instance for each column on the webpage
 app.leftMappageCollection = new app.MappageCollection()
 app.rightMappageCollection = new app.MappageCollection()
 

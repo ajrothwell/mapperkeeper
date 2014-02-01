@@ -3,6 +3,8 @@
 
 var app = app || {};
 
+// define the AppView object class
+// doing so will cause things to happed due to the "initialize" section
 app.AppView = Backbone.View.extend({
 	el: '#homemainpage',
 	initialize: function () {

@@ -3,6 +3,7 @@
 
 var app = app || {};
 
+// define the MappageView object class
 app.MappageView = Backbone.View.extend({
 	tagName: 'li',
 	template: _.template($('#item-template').html()),
