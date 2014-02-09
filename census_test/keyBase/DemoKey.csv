@@ -1,0 +1,13 @@
+code,demographic,scaletype,decimals,units,scaledown1,scaledown2
+noselection,,1,0,,1,1
+totalpop,Population,1,0, ,1,1
+popdense,Population Density,1,1,,1,1
+orwhite,White Population %,2,1,,1,1
+orblack,Black Population %,2,1,,1,1
+latino,Latino Population %,2,1,,1,1
+orasian,Asian Population %,2,1,,1,1
+orother,Other Race Population %,2,1,,1,1
+twoormorerace,Multiple Races Cohabiting %,2,1,,1,1
+totalhouse,Homes,1,0,,1,1
+housedense,Home Density,1,1,,1,1
+vacant,Vacant %,2,1,,1,1

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+<title>Philadelphia d3</title>
+<link rel='stylesheet' href='css/style.css' />
+
+<script src='js/lib/jquery-1.9.1.min.js'></script>
+<script src='js/lib/jquery-ui.min.js'></script>
+<script src='js/lib/d3.v3.min.js'></script>
+<script src='js/lib/d3.geo.projection.v0.min.js'></script>
+<script src='js/lib/topojson.v1.min.js'></script>
+<script src='js/scripts/initRoadMap.js'></script>
+<script src='js/scripts/testReadIn.js'></script>
+<script src='js/scripts/variables.js'></script>
+<script src='js/scripts/completeMap.js'></script>
+<script src='js/scripts/CMFunctions.js'></script>
+<script src='js/scripts/demographicsSetup.js'></script>
+
+
+
+
+</head>
+
+<body>
+
+<div id='infoDiv'>
+	<div class='universe_name_label'>Tract 002802</div>
+	<div class='nsStreet'></div>
+	<div class='ewStreet'></div>
+	<div class='LR_name_label'></div>
+	<div class='HR_name_label'></div>
+	<div class='demoNameText'></div>
+	<div class='demoValueText'></div>
+</div>
+
+<svg id='mapSVG'></svg>
+
+<script>
+
+	var svg = d3.select("#mapSVG");
+	var projection = d3.geo.mercator()
+		.center([-75.161044, 39.929629])
+		.scale(3000000);
+	var path = d3.geo.path()
+		.projection(projection);
+
+	var jsonobj = {};
+	var topologies = {};
+	$(document).ready(readIn);
+	
+	function precise_round(num,decimals){
+		if (num == undefined){
+			return '';
+		} else {
+			return (Math.round((num*Math.pow(10,decimals))+(10/Math.pow(100,decimals)))/Math.pow(10,decimals)).toFixed(decimals);
+		}
+	};
+ 
+
+
+</script>
+
+</body>
