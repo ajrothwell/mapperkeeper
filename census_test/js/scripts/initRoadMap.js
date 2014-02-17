@@ -1,6 +1,9 @@
 
 roadMouseOver = function(a){
 	$('.nsStreet').html(a.properties.name);
+/*	svg.select('#invG')
+		.style('pointer-events', 'none');
+*/
 };
 
 roadMouseOut = function(){
@@ -8,7 +11,7 @@ roadMouseOut = function(){
 };
 
 initRoadMap = function(){
-	svg.append('g')
+/*	svg.append('g')
 		.attr('id', 'theRoadG')
 		.attr('class', 'theRoadG')
 		.selectAll("path")
@@ -18,7 +21,7 @@ initRoadMap = function(){
 		.attr("id", function(d) {return d.properties.osm_id;} )
 		.attr("class", "road")
 		.attr("d", path);
-	
+*/	
 	initInvRoadMap();
 };
 
@@ -26,6 +29,7 @@ initInvRoadMap = function(){
 	svg.append('g')
 		.attr('id', 'invG')
 		.attr('class', 'invG')
+//	svg.select('#theShapeG')
 		.selectAll("path")
 		.data(jsonobj.roadData.features)
 		.enter()
@@ -35,4 +39,5 @@ initInvRoadMap = function(){
 		.attr("d", path)
 		.on("mouseover", function(d) { roadMouseOver(d); })
 		.on("mouseout", function() { roadMouseOut(); });
+
 };

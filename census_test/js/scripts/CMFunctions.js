@@ -51,7 +51,14 @@ addMap = function(){
 		.attr('Asian', function(d) {return getDemos(d, 'orasian'); })
 		.attr('Other', function(d) {return getDemos(d, 'orother'); })
 		.attr('d', path)
-		.on('mouseover', mouseOver)
+/*		.selectAll("path")
+		.data(jsonobj.roadData.features)
+		.enter()
+		.append("path")
+		.attr("class", "invisibleRoad")
+		.attr("name", function(d) {return d.properties.name;} )
+		.attr("d", path)
+*/		.on('mouseover', mouseOver)
 		.on('mouseout', mouseOut);
 //		.on('dblclick', dblClick);
 

@@ -8,6 +8,8 @@
 	border-top: none;
 	border-right: none;
 	border-bottom: none;
+	stroke: #000000;
+	stroke-width: 1px;
 }
 
 /*
@@ -68,10 +70,12 @@
 */
 
 .invisibleRoad {
+	fill: none;
 	fill-opacity: 0;
 	stroke-opacity: 0;
 	stroke: #0000FF;
 	stroke-width: 10px;
+/*	pointer-events: none; */
 }
 
 .road {
@@ -88,12 +92,12 @@ text {
 }
 
 /* the normal blue scale for scaletype 2 - percentages */
-.q0-9_2 { fill:rgb(247,251,255); }
-.q1-9_2 { fill:rgb(222,235,247); }
-.q2-9_2 { fill:rgb(198,219,239); }
-.q3-9_2 { fill:rgb(158,202,225); }
-.q4-9_2 { fill:rgb(107,174,214); }
-.q5-9_2 { fill:rgb(66,146,198); }
-.q6-9_2 { fill:rgb(33,113,181); }
-.q7-9_2 { fill:rgb(8,81,156); }
-.q8-9_2 { fill:rgb(8,48,107); }
+.q0-9_2 { fill:rgb(247,251,255); pointer-events: all; }
+.q1-9_2 { fill:rgb(222,235,247); pointer-events: all; }
+.q2-9_2 { fill:rgb(198,219,239); pointer-events: all; }
+.q3-9_2 { fill:rgb(158,202,225); pointer-events: all; }
+.q4-9_2 { fill:rgb(107,174,214); pointer-events: all; }
+.q5-9_2 { fill:rgb(66,146,198); pointer-events: all; }
+.q6-9_2 { fill:rgb(33,113,181); pointer-events: all; }
+.q7-9_2 { fill:rgb(8,81,156); pointer-events: all; }
+.q8-9_2 { fill:rgb(8,48,107); pointer-events: all; }
