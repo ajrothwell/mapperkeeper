@@ -1,7 +1,7 @@
 column,imgsrc,title,href,description
 left,images/phila_big.jpg,Philadelphia Census Map,../census_phila/,I really designed and created this census map from scratch using TopoJSON objects and the D3 JS API.  Use the pre-defined queries to see 2010 data at the tract or block level.
 left,images/FinalSite.jpg,USA Census Map,../census_usa/,I designed and created this census map from scratch using TopoJSON objects and the D3 JS API.  Use the pre-defined queries to see 2010 data at the state or county level.
-left,images/route_small.jpg,Local Route Map,p/route/,"This map uses the ArcGIS JavaScript API, HTML5 Geolocation, Yahoo Local Search Services, ArcGIS Geocode and Network Analyst Services."
+left,images/route.jpg,Local Route Map,p/route/,"This map uses the ArcGIS JavaScript API, HTML5 Geolocation, Yahoo Local Search Services, ArcGIS Geocode and Network Analyst Services."
 left,images/election_small.jpg,2012 Presidential Election Results by State,p/election/,This simple choropleth uses the Google Maps JavaScript API and Google Fusion Tables.
 left,images/MarylandCountyPopulation_small.jpg,Maryland County Population: Mercator Projection,p/D3/topojson_01.html,Created while teaching myself D3.
 left,images/azimuthal_equidistant_sm_01.jpg,World: Azimuthal Equidistant Projection,p/D3/azimuthal_equidistant_01.html,Created while teaching myself D3.
