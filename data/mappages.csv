@@ -1,5 +1,6 @@
 column,imgsrc,title,href,description
-left,images/phila_big.jpg,Philadelphia Census Map,../census_phila/,I really designed and created this census map from scratch using TopoJSON objects and the D3 JS API.  Use the pre-defined queries to see 2010 data at the tract or block level.
+left,images/phila_big.jpg,Philadelphia Manhole Inspections,http://phl.maps.arcgis.com/apps/webappviewer/index.html?id=7be9cdcc4cb64f3c977b698cc7cca2b9,I created this
+left,images/phila_big.jpg,Philadelphia Census Map,../census_phila/,I designed and created this census map from scratch using TopoJSON objects and the D3 JS API.  Use the pre-defined queries to see 2010 data at the tract or block level.
 left,images/FinalSite.jpg,USA Census Map,../census_usa/,I designed and created this census map from scratch using TopoJSON objects and the D3 JS API.  Use the pre-defined queries to see 2010 data at the state or county level.
 left,images/route.jpg,Local Route Map,p/route/,"This map uses the ArcGIS JavaScript API, HTML5 Geolocation, Yahoo Local Search Services, ArcGIS Geocode and Network Analyst Services."
 right,images/sl.jpg,Extractives and Fragile States,http://extractivesfragilestates.github.io/ExtractivesFragileStates/,"This is a team project created for the World Bank in the Summer/Fall 2013, which has not been completed; only the Liberia, Sierra Leone, Timor Leste, Democratic Republic of Congo, and Afghanistan maps have data overlays.  I created the original design using TileMill and the MapBox JS API.  Final site redesign using Jekyll was done by another team member."
